@@ -19,13 +19,14 @@ RUN apt-get update \
     libnss3 \
     libxss1 \
     tree \
+    curl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # switch back jovyan
 USER $NB_UID
 
 ## Install Extra JLab extensions
-# install noteboo-as-pdf
+# install notebook-as-pdf
 RUN python -m pip install -U notebook-as-pdf && \
     pyppeteer-install && \
     pip install --upgrade --quiet --no-cache-dir \
