@@ -25,20 +25,18 @@ RUN apt-get update \
 # switch back jovyan
 USER $NB_UID
 
-## Install Extra JLab extensions
-# install notebook-as-pdf
+# install notebook-as-pdf & lab extensions
 RUN python -m pip install -U notebook-as-pdf && \
     pyppeteer-install && \
-    pip install --upgrade --quiet --no-cache-dir \
+    pip install --upgrade --quiet --no-cache-dir\
     jupyterlab \
-    jupyterlab-git && \
+    'jupyterlab-git==0.30.0b2' \
+    jupyterlab-code-snippets && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
 # install other extension
-RUN jupyter labextension install @jupyterlab/toc --no-build && \
-    jupyter labextension install @ijmbarr/jupyterlab_spellchecker --no-build && \
-    jupyter labextension install jupyterlab-code-snippets --no-build && \
+RUN jupyter labextension install @ijmbarr/jupyterlab_spellchecker --no-build && \
     jupyter lab build -y && \
     jupyter lab clean -y && \
     npm cache clean --force && \
