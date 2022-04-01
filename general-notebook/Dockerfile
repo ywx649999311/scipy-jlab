@@ -1,7 +1,7 @@
 ARG BASE_CONTAINER=jupyter/scipy-notebook
 FROM $BASE_CONTAINER
 
-LABEL maintainer="Weixiang Yu <astro.flyfish@google.com>"
+LABEL maintainer="Weixiang Yu <astro.flyfish@gmail.com>"
 
 ## Install linux packages needed for JLab extensions
 USER root
@@ -19,32 +19,48 @@ RUN apt-get update \
     libnss3 \
     libxss1 \
     tree \
+    wget \
+    curl \
+    pandoc \
+    texlive texlive-latex-extra \
+    latexmk \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # switch back jovyan
 USER $NB_UID
 
-## Install Extra JLab extensions
-# install noteboo-as-pdf
+# Extension: notebook-as-pdf
 RUN python -m pip install -U notebook-as-pdf && \
     pyppeteer-install && \
-    pip install --upgrade --quiet --no-cache-dir \
-    jupyterlab \
-    jupyterlab-git && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
-# install other extension
-RUN jupyter labextension install @jupyterlab/toc --no-build && \
-    jupyter labextension install @ijmbarr/jupyterlab_spellchecker --no-build && \
-    jupyter labextension install jupyterlab-code-snippets --no-build && \
-    jupyter lab build -y && \
-    jupyter lab clean -y && \
-    npm cache clean --force && \
-    rm -rf "/home/${NB_USER}/.cache/yarn" && \
-    rm -rf "/home/${NB_USER}/.node-gyp" && \
+# Packages: pip
+RUN pip install 'python-lsp-server[all]' \
+    black \
+    yapf
+
+# Extension: install with mamba
+RUN mamba install --quiet --yes -c conda-forge \
+    jupyterlab \
+    jupyter-resource-usage \
+    jupyterlab-git \
+    jupyterlab-spellchecker \
+    jupyterlab_code_formatter \
+    jupyterlab-lsp && \
+    mamba clean --all -f -y && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
+
+# Other extensions: install with pip
+RUN pip install --upgrade --quiet --no-cache-dir \
+    jupyterlab-code-snippets \
+    aquirdturtle_collapsible_headings \
+    lckr-jupyterlab-variableinspector \
+    jupyterlab-topbar \
+    jupyterlab-system-monitor && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}"    
 
 ## clone/setup configs
 WORKDIR $HOME
