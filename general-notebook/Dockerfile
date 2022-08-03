@@ -29,16 +29,17 @@ RUN apt-get update \
 # switch back jovyan
 USER $NB_UID
 
-# Extension: notebook-as-pdf
+# Packages: notebook-as-pdf
 RUN python -m pip install -U notebook-as-pdf && \
     pyppeteer-install && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
 # Packages: pip
-RUN pip install 'python-lsp-server[all]' \
-    black \
-    yapf
+RUN python -m pip install -U black \
+    yapf && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}"    
 
 # Extension: install with mamba
 RUN mamba install --quiet --yes -c conda-forge \
@@ -46,8 +47,8 @@ RUN mamba install --quiet --yes -c conda-forge \
     jupyter-resource-usage \
     jupyterlab-git \
     jupyterlab-spellchecker \
-    jupyterlab_code_formatter \
-    jupyterlab-lsp && \
+    jupyterlab_code_formatter && \
+    # jupyterlab-lsp && \
     mamba clean --all -f -y && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
