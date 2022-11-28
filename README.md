@@ -8,5 +8,5 @@ docker pull wyu16/scipy-jlab
 
 ## Run Server
 ```bash
-docker run -d -v HOMEDIR:DOCKERDIR -p HOSTPORT:8888 --name container_name imageID start.sh jupyter lab --NotebookApp.passwork="sha:Password"
+docker run -d -v HOMEDIR:DOCKERDIR -p HOSTPORT:8888 --name container_name imageID start.sh jupyter lab --NotebookApp.password="sha:Password"
 ```
