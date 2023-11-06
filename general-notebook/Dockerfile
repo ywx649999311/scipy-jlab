@@ -1,5 +1,7 @@
-ARG BASE_CONTAINER=jupyter/scipy-notebook
-FROM $BASE_CONTAINER
+ARG REGISTRY=quay.io
+ARG OWNER=jupyter
+ARG BASE_CONTAINER=$REGISTRY/$OWNER/scipy-notebook
+FROM --platform=linux/arm64 $BASE_CONTAINER
 
 LABEL maintainer="Weixiang Yu <astro.flyfish@gmail.com>"
 
@@ -36,8 +38,7 @@ RUN python -m pip install -U notebook-as-pdf && \
     fix-permissions "/home/${NB_USER}"
 
 # Packages: pip
-RUN python -m pip install -U black \
-    yapf && \
+RUN python -m pip install -U black && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"    
 
@@ -58,8 +59,9 @@ RUN pip install --upgrade --quiet --no-cache-dir \
     jupyterlab-code-snippets \
     aquirdturtle_collapsible_headings \
     lckr-jupyterlab-variableinspector \
-    jupyterlab-topbar \
-    jupyterlab-system-monitor && \
+    # jupyterlab-topbar \
+    # jupyterlab-system-monitor && \
+    jupyter-resource-usage && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"    
 
@@ -67,6 +69,6 @@ RUN pip install --upgrade --quiet --no-cache-dir \
 WORKDIR $HOME
 RUN git clone https://github.com/ywx649999311/configs.git && \
     cd configs && \
-    /bin/bash -c "bash setup.sh" && \
+    /bin/bash -c "bash setup_remote_bash.sh" && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
